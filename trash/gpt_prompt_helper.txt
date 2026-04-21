@@ -34,7 +34,8 @@ Your role:
 
 
 Current status:
-I was able to turn the board on via usb, shh and turn and off the LEDs.
+I was able to turn the board on via usb, shh and turn and off the LEDs. 
+I have added a bash script that enables the on/off/blink on the board.
 
 
 Based on this, suggest the next step.
