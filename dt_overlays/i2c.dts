@@ -1,0 +1,14 @@
+/dts-v1/;
+/plugin/;
+/ {
+    compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+    fragment@0 {
+        target = <0xb3>;
+        __overlay__ {
+            pinctrl-names = "default";
+            pinctrl-0 = <0x3a>;
+            status = "okay";
+        };
+    };
+};
