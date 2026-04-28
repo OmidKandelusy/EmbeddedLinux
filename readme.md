@@ -19,7 +19,7 @@ Next, for any subsequent updates or development, you can apply the changes to th
 - have the imager tool and a debian image ready, from the [beaglebone page](https://www.beagleboard.org/distros).
 
 
-### U-Boot Recovery (serial required)
+### U-Boot Recovery
 Use your uart-dongle (USB-to-TTL) to connect to the board via the serial debug header where the label of the pins on the board are labeled one to six left to right starting from the label `j1` where the pin 1 is the ground, pin 4 is the rx and pin 5 is the tx [[*See page 73 on the manual*](/doc/beaglebone-black.pdf)]. Note: you do not need to connect the 3.3V pin of the dongle, as the board in not powered by the serial connection. A basic recovery manuver via the U-Boot shell interface for disabling the overlay culprit can be done as follows:
 
 ```bash
@@ -32,7 +32,7 @@ setenv bootargs console=ttyS0,115200n8 root=/dev/mmcblk1p3 rw rootfstype=ext4 ro
 bootz ${loadaddr} ${rdaddr}:${filesize} ${fdtaddr}
 ```
 
-### microSD Recovery (when U-Boot can't be interrupted)
+### microSD Recovery
 In cases when the eMMC drive is not accessible, for example an overlay messed up the derive's description by overwritting it, the only way to recover is through a secondary boot disck. Assuming an sdcard loaded with the debian image is ready, after loging in into the OS on the serial debug, the basic recovery manuver for diabling the culprit overlay can be done as 
 
 ```bash

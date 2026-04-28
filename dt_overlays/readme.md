@@ -172,66 +172,6 @@ cat /boot/uEnv.txt | grep overlay
 
 On this system, overlays are loaded by U-Boot at addresses `uboot_overlay_addr0` through `addr7`. The `addr0` slot was occupied by the I2C overlay, so the PWM overlay was placed at `addr1`.
 
----
-
-## The Resulting Overlay
-
-With all of the above information gathered, the overlay can be written with confidence. Each element is justified by what the investigation revealed.
-
-```dts
-/dts-v1/;
-/plugin/;
-
-/*
- * Device Tree Overlay for EHRPWM1A on P9_14
- *
- * Hardware target : BeagleBone Black
- * Kernel tested   : 6.12.28-bone25
- * PWM channel     : EHRPWM1A (channel A of PWM subsystem 1)
- * Header pin      : P9_14 (control register 0x44e10848)
- *
- * Investigation summary:
- *   - /sys/class/pwm/ was empty → hardware not exposed
- *   - ehrpwm driver was loaded but unbound → driver ready, node missing
- *   - epwmss1/ehrpwm1 nodes exist in base DTB but status = disabled
- *   - P9_14 (pin 18) was in GPIO mode (0x27) → needs mode 6 for PWM
- *   - pinctrl-single on 6.12 requires 3-value pin entries: <offset config mode>
- *
- * After loading:
- *   /sys/class/pwm/pwmchip0/pwm0/  and  pwm1/  appear automatically
- */
-
-&am33xx_pinmux {
-    ehrpwm1a_pins: pinmux_ehrpwm1a_pins {
-        pinctrl-single,pins = <
-            /*
-             * P9_14 offset = 0x44e10848 - 0x44e10800 = 0x48
-             * 0x00 = output direction, no pull resistor
-             * 0x06 = mux mode 6 → EHRPWM1A signal
-             */
-            0x48  0x00  0x06
-        >;
-    };
-};
-
-&epwmss1 {
-    /*
-     * EPWMSS1 is the parent clock/power domain for EHRPWM1.
-     * It must be enabled first or the child node receives no clock.
-     */
-    status = "okay";
-};
-
-&ehrpwm1 {
-    /*
-     * Enabling this causes the ehrpwm driver to bind,
-     * creating /sys/class/pwm/pwmchipN entries.
-     */
-    pinctrl-names = "default";
-    pinctrl-0 = <&ehrpwm1a_pins>;
-    status = "okay";
-};
-```
 
 ## Verification After Reboot
 
@@ -328,10 +268,7 @@ sudo dmesg | grep -i "i2c"
 # [    3.531236] omap_i2c 44e0b000.i2c: bus 0 rev0.11 at 400 kHz
 ```
 
-I2C2 bound cleanly at 100 kHz standard mode with no errors. The key takeaway is that the
-investigation methodology is the same regardless of the peripheral — it is the findings that
-determine how much work the overlay needs to do. In this case the answer was: very little.
-
+I2C2 bound cleanly at 100 kHz standard mode with no errors. The key takeaway is that the investigation methodology is the same regardless of the peripheral — it is the findings that determine how much work the overlay needs to do. In this case the answer was: very little.
 
 ## Investigation Checklist Summary
 
