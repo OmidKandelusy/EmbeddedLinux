@@ -1,0 +1,58 @@
+/dts-v1/;
+/plugin/;
+
+/*
+ * Device Tree Overlay for EHRPWM1A on P9_14
+ *
+ * Hardware target : BeagleBone Black
+ * Kernel tested   : 6.12.28-bone25
+ * PWM channel     : EHRPWM1A (channel A of PWM subsystem 1)
+ * Header pin      : P9_14 (control register 0x44e10848)
+ *
+ * What this overlay does:
+ *   1. Remuxes P9_14 from GPIO mode (0x27) to PWM mode (0x06)
+ *   2. Enables the EPWMSS1 parent subsystem node
+ *   3. Enables the EHRPWM1 child node so the kernel driver binds to it
+ *
+ * After loading, the PWM is accessible via:
+ *   /sys/class/pwm/pwmchip<N>/
+ */
+
+&am33xx_pinmux {
+    ehrpwm1a_pins: pinmux_ehrpwm1a_pins {
+        pinctrl-single,pins = <
+            /*
+             * P9_14 = control register offset 0x048 from pinmux base
+             * 0x06 = mode 6 (EHRPWM1A) | output | no pull
+             *
+             * Breakdown of 0x06:
+             *   bits [2:0] = 110 → mux mode 6 = ehrpwm1A
+             *   bit  [3]   = 0   → no pull up/down
+             *   bit  [4]   = 0   → pull inactive
+             *   bit  [5]   = 0   → input disabled (output pin)
+             *   bit  [6]   = 0   → no slew control
+             */
+            0x048 0x06
+        >;
+    };
+};
+
+&epwmss1 {
+    /*
+     * EPWMSS1 is the parent subsystem at base address 0x48302000.
+     * It gates the clock for everything inside it (EHRPWM1, ECAP1, EQEP1).
+     * Must be enabled first or the child node will not get a clock.
+     */
+    status = "okay";
+};
+
+&ehrpwm1 {
+    /*
+     * EHRPWM1 is the actual PWM hardware at 0x48302200.
+     * Enabling this causes the kernel ehrpwm driver to bind,
+     * which creates /sys/class/pwm/pwmchipN entries.
+     */
+    pinctrl-names = "default";
+    pinctrl-0 = <&ehrpwm1a_pins>;
+    status = "okay";
+};
