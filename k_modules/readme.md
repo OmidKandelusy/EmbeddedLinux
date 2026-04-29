@@ -48,12 +48,44 @@ Kernel headers must be present on the board:
 
 ```bash
 ls /lib/modules/$(uname -r)/build
-
-# If missing:
-sudo apt install linux-headers-$(uname -r)
 ```
 
-## Modules
+By default, the linux hedear files will not be probably present on the beagle bone black. So, you would need to install the headers. To do so, we first check the version of the current kernel running on the board:
+
+```bash
+uname -r
+```
+
+Next, we query the repo metadata to find the exact `.deb` filename matching the kernel version:
+
+```bash
+curl -L "http://repos.rcn-ee.com/debian/dists/bookworm/main/binary-armhf/Packages.gz" -o Packages.gz && gunzip Packages.gz && grep -A10 "6.12.28-bone25" Packages
+```
+Look for the `Filename:` field under the `linux-headers` entry and then download the Headers Package on your host
+machine because the beagle bone connect (the base mode) does not have the Wi-Fi:
+```bash
+curl -L "http://repos.rcn-ee.com/debian/pool/main/l/linux-upstream/linux-headers-6.12.28-bone25_1bookworm_armhf.deb" -o linux-headers-6.12.28-bone25.deb
+```
+Note that the file is saved in whichever directory you run this command from. Once downloaded, we transfer the file to the
+beagle bone black via secure copy and then install it:
+```bash
+scp linux-headers-6.12.28-bone25.deb debian@<BBB_IP>:/home/debian/
+
+sudo dpkg -i linux-headers-6.12.28-bone25.deb
+```
+You can verify that the header were installed correctly by looking at the build folder:
+```bash
+ls /lib/modules/$(uname -r)/build
+```
+You should see: `Makefile  Module.symvers  arch  include  scripts`
+
+Furthermore, there might be some warning regarind the time and data mismatch. The beagle bone black clock is often
+out of sync which causes harmless but noisy build warnings. You can fix it with:
+```bash
+sudo date -s "$(date '+%Y-%m-%d %H:%M:%S')"
+```
+
+# Current Modules
 
 | Directory | Description |
 |-----------|-------------|
