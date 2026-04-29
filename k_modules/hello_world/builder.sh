@@ -5,16 +5,16 @@ set -e
 make
 
 # Load the module
-sudo insmod hello.ko
+sudo insmod hello_world.ko
 
 # Verify it loaded
-lsmod | grep hello
+lsmod | grep hello_world
 
 # Check the kernel log
 sudo dmesg | tail -5
 
 # Unload
-sudo rmmod hello
+sudo rmmod hello_world
 
 # Confirm the exit message
 sudo dmesg | tail -5
