@@ -90,3 +90,4 @@ sudo date -s "$(date '+%Y-%m-%d %H:%M:%S')"
 | Directory | Description |
 |-----------|-------------|
 | hello_world | Minimal module demonstrating init/exit lifecycle and printk |
+| button_irq  | it shows how to add interrupt to a gpio pin and get a callback |

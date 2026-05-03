@@ -11,9 +11,7 @@
  * - Interrupt on rising edge (button press)
  */
 
-// TODO: Change this to the actual GPIO number
-// On BeagleBone Black, GPIO numbers are NOT pin numbers
-#define BUTTON_GPIO  49
+#define BUTTON_GPIO  526
 
 static unsigned int irq_number;
 
@@ -60,7 +58,7 @@ static int __init gpio_irq_init(void)
     result = request_irq(
         irq_number,
         gpio_irq_handler,
-        IRQF_TRIGGER_RISING,
+        IRQF_TRIGGER_FALLING,
         "gpio_irq_handler",
         NULL
     );
