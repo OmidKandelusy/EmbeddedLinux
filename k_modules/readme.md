@@ -79,7 +79,7 @@ ls /lib/modules/$(uname -r)/build
 ```
 You should see: `Makefile  Module.symvers  arch  include  scripts`
 
-Furthermore, there might be some warning regarind the time and data mismatch. The beagle bone black clock is often
+Furthermore, there might be some warning regarding the time and data mismatch. The beagle bone black clock is often
 out of sync which causes harmless but noisy build warnings. You can fix it with:
 ```bash
 sudo date -s "$(date '+%Y-%m-%d %H:%M:%S')"
